@@ -1,5 +1,5 @@
 @echo off
-set URL=https://9a40b0bac7ee.ngrok-free.app
+set URL=untranslated-julee-contrite.ngrok-free.app
 
 :loop
     rem Wait 0.5 seconds (approx) using ping trick
@@ -16,3 +16,4 @@ set URL=https://9a40b0bac7ee.ngrok-free.app
     )
 
     goto loop
+
