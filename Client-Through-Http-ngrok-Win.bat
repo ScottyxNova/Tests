@@ -1,5 +1,5 @@
 @echo off
-set URL=https://untranslated-julee-contrite.ngrok-free.app
+set URL=https://acne-cbs-submitting-commander.trycloudflare.com
 
 :loop
     rem Wait 0.5 seconds (approx) using ping trick
