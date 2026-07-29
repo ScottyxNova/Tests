@@ -1,5 +1,5 @@
 @echo off
-set URL=https://acne-cbs-submitting-commander.trycloudflare.com
+set URL=https://mph-politics-blind-emerging.trycloudflare.com
 
 :loop
     ping -n 1 127.0.0.1 >nul
