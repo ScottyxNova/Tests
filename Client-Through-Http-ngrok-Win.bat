@@ -1,5 +1,5 @@
 @echo off
-set URL=https://acne-cbs-submitting-commander.trycloudflare.com
+set URL=https://mph-politics-blind-emerging.trycloudflare.com
 
 :loop
     rem Wait 0.5 seconds (approx) using ping trick
