@@ -1,5 +1,5 @@
 @echo off
-set URL=https://hans-apparel-engaged-distributed.trycloudflare.com
+set URL=https://noneconomical-trisha-waitingly.ngrok-free.dev
 
 :loop
     ping -n 1 127.0.0.1 >nul
